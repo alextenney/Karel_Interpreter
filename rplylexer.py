@@ -1,22 +1,30 @@
 import rply
 from rply import LexerGenerator
 
+'''
+Content adapted from both the RPLY documentation and Josh Sharp's blog post "Using RPython and RPly to build a language interpreter, part 1".
+
+RPLY: https://media.readthedocs.org/pdf/rply/latest/rply.pdf and https://rply.readthedocs.io/en/latest/
+
+Josh Sharp: http://joshsharp.com.au/blog/rpython-rply-interpreter-1.html
+
+'''
+
 def lex():
     lg = LexerGenerator()
     
     # build up a set of token names and regexes they match 
-    lg.add('INDENT','\t' )
-    lg.add('SPACE', '\s')
+    lg.add('WHITESPACE', r'[ ]+' )
     lg.add('INTEGER', r'-?\d+')
     lg.add('IF', r'if(?!\w)')
     lg.add('ELSE', r'else(?!\w)')
     lg.add('WHILE', r'while(?!\w)')
+    lg.add('FOR', 'for i in range')
     lg.add('FUNCTION', r'def(?!\w)')
-    lg.add('MODULE', r'mod(?!\w)')
     lg.add('COLON', ':')
     lg.add('OPENPAREN', '\(')
     lg.add('CLOSEPAREN', '\)')
-    #lg.add('NEWLINE', '\n')
+    lg.add('NEWLINE', r'\n')
     lg.add('IMPORT','from karel import \*')
     lg.add('BEGIN', 'begin_karel_program')
     lg.add('END', 'end_karel_program')
@@ -37,11 +45,12 @@ def lex():
     lg.add('PRESENT', 'beepers_present')
     lg.add('INBAG', 'beepers_in_bag')
     lg.add('NOTCHECK', 'not')
-    #this does work
     lg.add('IDENTIFIER', '[a-zA-Z_][a-zA-Z0-9_]*')
     
     # ignore whitespace 
-    lg.ignore('[\n]')
+    lg.ignore('#.*\n')
+    lg.ignore('"""(.|\n)*?"""')
+    lg.ignore("'''(.|\n)*?'''")
     
     lexer = lg.build()
 
